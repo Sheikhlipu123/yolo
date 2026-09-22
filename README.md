@@ -1,158 +1,163 @@
 # AI Aimbot Android
 
-Android FPS 游戏 AI 瞄准辅助工具，基于 YOLOv8n 实时目标检测，支持骁龙 Hexagon QNN HTP 加速。
+An Android FPS game AI aiming assistant based on real-time YOLOv8n object detection, with Qualcomm Hexagon QNN HTP acceleration support.
 
 ---
 
-## 设备要求
+## Device requirements
 
-| 项目 | 要求 |
-|------|------|
-| 芯片 | **骁龙 8 Gen 1 及以上**（SM8450+） |
-| 系统 | Android 12 (API 31) 及以上 |
-| 架构 | arm64-v8a |
+| Item | Requirement |
+|------|-------------|
+| Chipset | **Snapdragon 8 Gen 1 or newer** (SM8450+) |
+| Android | Android 12 (API 31) or newer |
+| Architecture | arm64-v8a |
 
-> 低于骁龙 8 Gen 1 的设备可能无法正常运行或推理速度过慢。
-
----
-
-## 下载安装
-
-1. 前往 [Releases](https://github.com/xiangsu1145/Auto-aim_android-yolo/releases) 页面
-2. 下载最新版本的 APK 文件
-3. 在手机上安装 APK（需允许安装未知来源应用）
+> Devices below Snapdragon 8 Gen 1 may not run correctly or may provide insufficient inference performance.
 
 ---
 
-## 前置准备
+## Download and install
 
-### 1. 安装 Shizuku
-
-本应用依赖 Shizuku 进行触控注入，必须先完成 Shizuku 的设置：
-
-1. 在应用商店或 [Shizuku 官网](https://shizuku.rikka.app/) 下载安装 Shizuku
-2. 打开 Shizuku，选择 **通过无线调试启动**
-3. 按照 Shizuku 内的指引完成配对（需在开发者选项中开启无线调试）
-4. 确保 Shizuku 状态显示为 **运行中**
-
-### 2. 授权应用
-
-1. 打开 Shizuku → **管理已授权应用**
-2. 找到本应用，开启授权
+1. Go to the [Releases](https://github.com/xiangsu1145/Auto-aim_android-yolo/releases) page.
+2. Download the latest APK.
+3. Install the APK on your phone. You may need to allow installation from unknown sources.
 
 ---
 
-## 使用教程
+## Prerequisites
 
-### 第一步：启动应用
+### 1. Install Shizuku
 
-打开应用后，主界面会显示当前状态和可用模型列表。
+This application uses Shizuku for touch injection. Shizuku must be configured before starting the app:
 
-### 第二步：授予权限
+1. Install Shizuku from an app store or the [Shizuku website](https://shizuku.rikka.app/).
+2. Open Shizuku and choose **Start via wireless debugging**.
+3. Follow Shizuku's pairing instructions. Wireless debugging must be enabled in Developer options.
+4. Confirm that Shizuku shows a **Running** status.
 
-首次运行需要授予以下权限：
+### 2. Authorize the application
 
-- **屏幕录制权限**：用于截取游戏画面进行检测
-- **悬浮窗权限**：用于显示检测覆盖层和控制面板
-
-应用会自动弹出权限请求，按提示允许即可。
-
-### 第三步：选择模型
-
-在主界面选择要使用的检测模型：
-
-| 模型 | 说明 |
-|------|------|
-| INT8 192 | 推荐，速度快，精度足够 |
-| INT8 256 | 精度更高，速度稍慢 |
-| Float32 192 | 测试用，不推荐日常使用 |
-
-### 第四步：启动服务
-
-1. 点击 **启动** 按钮
-2. 悬浮球（AI图标）会出现在屏幕上
-3. 切换到游戏
-
-### 第五步：游戏内操作
-
-**悬浮球**：
-- 可以拖动到任意位置
-- 点击悬浮球打开/关闭控制面板
-- 长按悬浮球可停止服务
-
-**控制面板**（点击悬浮球打开）：
-
-| 标签 | 功能 |
-|------|------|
-| 自瞄 | 开关自动瞄准、调节 PID 参数（响应速度/平滑度） |
-| 扳机 | 开关自动扳机（准心对准目标时自动开火） |
-| 模型 | 切换检测模型 |
-| 系统 | 置信度阈值、系统设置 |
-
-### 功能说明
-
-**自动瞄准**：
-- 检测到敌人后，自动将准心移动到目标位置
-- 通过 PID 控制器实现平滑追踪，不会出现瞬移
-- 支持调节响应速度：Kp（比例）越大响应越快，Kd（微分）越大越平滑
-
-**自动扳机**：
-- 当准心与检测到的目标重合时，自动开火
-- 可设置触发区域大小
-
-**按住开火（Hold-to-Fire）**：
-- 需要用物理手指按住触发区域，自动瞄准才会激活
-- 松手即停止，防止非预期操作
-
-**检测覆盖层**：
-- 屏幕上会显示检测到的目标边界框
-- 绿色框 = 高置信度，黄色框 = 低置信度
-- 可在设置中关闭覆盖层显示
+1. Open Shizuku → **Authorized applications**.
+2. Find this application and enable its authorization.
 
 ---
 
-## 常见问题
+## Usage
 
-### Q: 启动后没有检测框出现
+### Step 1: Start the application
 
-- 确认已授予屏幕录制权限
-- 确认 Shizuku 正在运行且已授权本应用
-- 尝试降低置信度阈值（控制面板 → 系统）
+Open the application. The main screen shows the current status and available models.
 
-### Q: 自瞄不生效
+### Step 2: Grant permissions
 
-- 确认 Shizuku 状态为运行中
-- 确认已在控制面板中开启自瞄开关
-- 如果开启了「按住开火」，需要物理手指按住触发区域
+The first launch requires these permissions:
 
-### Q: 推理速度慢 / 卡顿
+- **Screen recording**: captures the game screen for detection.
+- **Display over other apps**: displays the detection overlay and control panel.
 
-- 确认设备芯片为骁龙 8 Gen 1 或以上
-- 尝试切换到 INT8 192 模型（速度最快）
-- 关闭其他占用性能的应用
+The application opens the permission requests automatically. Follow the prompts and grant access.
 
-### Q: 提示 Shizuku 连接失败
+### Step 3: Select a model
 
-- 重新启动 Shizuku（通过无线调试启动）
-- 确认无线调试的配对码已正确输入
-- 重启手机后重试
+Select a detection model on the main screen:
 
-### Q: 游戏内触摸无响应
+| Model | Description |
+|-------|-------------|
+| INT8 192 | Recommended; fastest option with sufficient accuracy |
+| INT8 256 | Higher accuracy with slightly lower performance |
+| Float32 192 | For testing; not recommended for everyday use |
 
-- 检查是否与其他悬浮窗应用冲突
-- 重新启动本应用的服务
+### Step 4: Start the service
+
+1. Tap **Start**.
+2. The floating AI icon appears on the screen.
+3. Switch to the game.
+
+### Step 5: Use the in-game controls
+
+**Floating icon:**
+
+- Drag it to any position.
+- Tap it to open or close the control panel.
+- Long-press it to stop the service.
+
+**Control panel** (opened by tapping the floating icon):
+
+| Tab | Function |
+|-----|----------|
+| Aim | Enable automatic aiming and adjust PID parameters such as responsiveness and smoothness |
+| Trigger | Enable automatic trigger behavior when the crosshair is over a target |
+| Model | Switch the detection model |
+| System | Configure the confidence threshold and system settings |
+
+### Features
+
+**Automatic aiming:**
+
+- Moves the crosshair toward detected targets.
+- Uses a PID controller for smooth tracking instead of instantaneous movement.
+- Supports response tuning: a higher Kp value increases response speed, while a higher Kd value increases smoothing.
+
+**Automatic trigger:**
+
+- Fires when the crosshair overlaps a detected target.
+- Supports configurable trigger-area size.
+
+**Hold-to-fire:**
+
+- Requires a physical finger to remain inside the trigger area before automatic aiming is activated.
+- Stops when the finger is released to help prevent unintended actions.
+
+**Detection overlay:**
+
+- Displays bounding boxes around detected targets.
+- Green box = high confidence; yellow box = low confidence.
+- Can be disabled in settings.
 
 ---
 
-## 注意事项
+## Frequently asked questions
 
-- 本工具仅供学习和研究用途
-- 在线游戏中使用可能违反游戏条款，请自行承担风险
-- 首次启动时模型文件会从 assets 解压到内部存储，可能需要几秒钟
-- 建议在游戏开始前启动服务，游戏结束后停止服务以节省电量
+### Q: No detection boxes appear after starting
+
+- Confirm that screen recording permission was granted.
+- Confirm that Shizuku is running and has authorized this application.
+- Try lowering the confidence threshold in Control panel → System.
+
+### Q: Automatic aiming does not work
+
+- Confirm that Shizuku is running.
+- Confirm that automatic aiming is enabled in the control panel.
+- If **Hold-to-fire** is enabled, keep a physical finger inside the trigger area.
+
+### Q: Inference is slow or stutters
+
+- Confirm that the device uses Snapdragon 8 Gen 1 or newer.
+- Switch to the INT8 192 model, which is the fastest option.
+- Close other applications that are using significant system resources.
+
+### Q: Shizuku connection fails
+
+- Restart Shizuku using wireless debugging.
+- Confirm that the wireless-debugging pairing code was entered correctly.
+- Restart the phone and try again.
+
+### Q: Touch input does not work in the game
+
+- Check for conflicts with other overlay applications.
+- Restart the application's service.
+
+---
+
+## Important notes
+
+- This tool is provided for learning and research purposes only.
+- Using it in online games may violate the games' terms of service. Use it at your own risk.
+- On first launch, model files are extracted from `assets` to internal storage. This may take several seconds.
+- Start the service before beginning a game and stop it after the game to reduce battery usage.
 
 ---
 
 ## License
 
-GNU GPL v3 - See [LICENSE](LICENSE)
+GNU GPL v3 — See [LICENSE](LICENSE).
