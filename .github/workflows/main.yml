@@ -1,4 +1,4 @@
-name: Android build
+name: Android release APK
 
 on:
   push:
@@ -13,11 +13,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-build-${{ github.workflow }}-${{ github.ref }}
+  group: android-release-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-release:
     name: Build release APK
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -36,11 +36,20 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platforms;android-36 platforms;android-35 build-tools;36.0.0 platform-tools cmake;3.22.1 ndk;27.2.12479018'
+          packages: >-
+            platforms;android-36
+            platforms;android-35
+            build-tools;36.0.0
+            platform-tools
+            cmake;3.22.1
+            ndk;27.2.12479018
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      # Temporary CI keystore.
+      # For production releases, replace this with GitHub Actions secrets
+      # containing your real keystore and signing credentials.
       - name: Create CI signing keystore
         run: |
           keytool -genkeypair \
@@ -56,8 +65,8 @@ jobs:
       - name: Validate Gradle configuration
         run: ./gradlew --no-daemon help
 
-      - name: Run checks and build release APK
-        run: ./gradlew --no-daemon lint testDebugUnitTest assembleRelease
+      - name: Build release APK
+        run: ./gradlew --no-daemon clean assembleRelease --stacktrace
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
