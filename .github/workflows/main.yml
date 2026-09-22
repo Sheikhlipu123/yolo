@@ -10,11 +10,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: android-release-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  APK_PATH: app/build/outputs/apk/release/app-release.apk
 
 jobs:
   build-release:
@@ -25,6 +28,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -47,9 +52,6 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Temporary CI keystore.
-      # For production releases, replace this with GitHub Actions secrets
-      # containing your real keystore and signing credentials.
       - name: Create CI signing keystore
         run: |
           keytool -genkeypair \
@@ -68,10 +70,30 @@ jobs:
       - name: Build release APK
         run: ./gradlew --no-daemon clean assembleRelease --stacktrace
 
-      - name: Upload release APK
+      - name: Verify APK output
+        run: |
+          test -f "$APK_PATH"
+          file "$APK_PATH"
+          unzip -t "$APK_PATH" >/dev/null
+          sha256sum "$APK_PATH"
+
+      - name: Upload APK as workflow artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: aimbot-release-apk-${{ github.sha }}
-          path: app/build/outputs/apk/release/*.apk
+          path: ${{ env.APK_PATH }}
           if-no-files-found: error
+          compression-level: 0
           retention-days: 14
+
+      - name: Create GitHub Release with direct APK asset
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v1.2.1-build.${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" "$APK_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Aimbot Android $TAG" \
+            --generate-notes
